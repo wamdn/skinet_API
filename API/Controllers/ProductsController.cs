@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,73 +10,40 @@ namespace API.Controllers;
 [ApiController]
 public class ProductsController : ControllerBase
 {
-    private readonly StoreContext _db;
+    private readonly IProductRepository _repo;
 
-    public ProductsController(StoreContext db)
+    public ProductsController(IProductRepository repo)
     {
-        _db = db;
+        _repo = repo;
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Product>> GetProduct([FromRoute] int id)
     {
-        Product? productOrNull = await _db.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+        Product? productOrNull = await _repo.GetProductAsync(id);
         if (productOrNull is null) return BadRequest();
 
-        return Ok(productOrNull);
+        return productOrNull;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Product>>> GetProducts()
     {
-        List<Product> products = await _db.Products.AsNoTracking().ToListAsync();
-        return Ok(products);
+        IReadOnlyList<Product> products = await _repo.GetProductsAsync();
+        return products.ToList();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Product>> SaveProduct([FromBody] Product product)
+    [HttpGet("brands")]
+    public async Task<ActionResult<List<ProductBrand>>> GetProductBrands()
     {
-        if (!ModelState.IsValid) return BadRequest();
-
-        _db.Products.Add(product);
-        await _db.SaveChangesAsync();
-        return Ok(product);
+        IReadOnlyList<ProductBrand> brands = await _repo.GetProductBrandsAsync();
+        return brands.ToList();
     }
 
-    [HttpPatch]
-    public async Task<ActionResult<Product>> patchProduct([FromBody] Product product)
+    [HttpGet("types")]
+    public async Task<ActionResult<List<ProductType>>> GetProductTypes()
     {
-        if (!ModelState.IsValid) return BadRequest();
-
-        Product? productToPatchOrNull = await _db.Products.FirstOrDefaultAsync(p => p.Id == product.Id);
-        if (productToPatchOrNull is null) return BadRequest();
-
-        if (!productToPatchOrNull.Name.Equals(product.Name))
-            productToPatchOrNull.Name = product.Name;
-
-        await _db.SaveChangesAsync();
-        return Ok(productToPatchOrNull);
-    }
-
-    [HttpPut]
-    public async Task<ActionResult<Product>> updateProduct([FromBody] Product product)
-    {
-        if (!ModelState.IsValid) return BadRequest();
-
-        _db.Products.Update(product);
-        await _db.SaveChangesAsync();
-
-        return Ok(product);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> deleteProduct([FromRoute] int id)
-    {
-        Product? product = _db.Products.FirstOrDefault(p => p.Id == id);
-        if (product is null) return BadRequest();
-
-        _db.Products.Remove(product);
-        await _db.SaveChangesAsync();
-        return Ok();
+        IReadOnlyList<ProductType> types = await _repo.GetProductTypesAsync();
+        return types.ToList();
     }
 }

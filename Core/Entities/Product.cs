@@ -3,12 +3,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Entities;
 
-public class Product
+public class Product : BaseEntity
 {
-   
-    [Key]
-    public int Id { get; set; }
-    [Required]
-    [StringLength(maximumLength: 255, MinimumLength = 3)]
     public string Name { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public decimal Price { get; set; }
+
+    public string PictureUrl { get; set; } = string.Empty;
+
+    /* Relations */
+
+    public int ProductTypeId { get; set; }
+    public ProductType ProductType { get; set; }
+
+
+    public int ProductBrandId { get; set; }
+    public ProductBrand ProductBrand { get; set; }
 }
