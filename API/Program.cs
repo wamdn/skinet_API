@@ -1,3 +1,4 @@
+using API.Helpers;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repository;
@@ -15,7 +16,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<StoreContext>();
 // Add ProductRepository
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-
+// Add GenericRepository
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// Add Automapper
+builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
 var app = builder.Build();
 
@@ -25,8 +29,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

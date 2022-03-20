@@ -22,7 +22,6 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetProductAsync(int id)
     {
-        Debug.WriteLine(_db.ChangeTracker.QueryTrackingBehavior);
         return await _db.Products
                         .Include(p => p.ProductBrand)
                         .Include(p => p.ProductType)

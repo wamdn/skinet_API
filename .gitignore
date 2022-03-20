@@ -5,6 +5,7 @@ appsettings.json
 *.db-shm
 *.db-wal
 *.DotSettings.user
+*.csproj.user
 .vs
 .fake
 .ionide
