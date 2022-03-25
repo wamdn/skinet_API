@@ -1,59 +1,45 @@
+using API.Extensions;
 using API.Helpers;
-using Core.Interfaces;
+using API.Middlewares;
 using Infrastructure.Data;
-using Infrastructure.Repository;
-using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+// Add repositories & Custom invalid ModelState error response
+builder.Services.AddApplicationServices();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-// Add DbContext Sqlite
+if (builder.Environment.IsDevelopment()) builder.Services.AddSwaggerDocumentation();
+// Add DbContext
 builder.Services.AddDbContext<StoreContext>();
-// Add ProductRepository
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-// Add GenericRepository
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 // Add Automapper
 builder.Services.AddAutoMapper(typeof(MappingProfiles));
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+// Custom exception handler
+app.UseMiddleware<ExceptionMiddleware>();
+// Custom error handler in case no route is match
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
 app.UseAuthorization();
 
+if (app.Environment.IsDevelopment()) app.UseSwaggerDocumentation();
+
 app.MapControllers();
 
-// Database update at startup
-using (IServiceScope scope = app.Services.CreateScope())
-{
-    IServiceProvider service = scope.ServiceProvider;
-    ILoggerFactory loggerFactory = service.GetRequiredService<ILoggerFactory>();
+// Database creating and seeding at startup
+await app.UseDatabaseSeeding();
 
-    try
-    {
-        StoreContext ctx = service.GetRequiredService<StoreContext>();
-        await ctx.Database.MigrateAsync();
-        await StoreContextSeed.SeedAsync(ctx, loggerFactory);
-    }
-    catch (Exception ex)
-    {
-        ILogger logger = loggerFactory.CreateLogger<Program>();
-        logger.LogError(ex, "An error occurred during migration");
-    }
-}
 
 app.Run();
