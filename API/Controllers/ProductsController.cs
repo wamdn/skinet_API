@@ -41,10 +41,12 @@ public class ProductsController : BaseApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ProductDTO>>> GetProducts()
+    public async Task<ActionResult<List<ProductDTO>>> GetProducts(
+        [FromQuery] string? sort, [FromQuery] bool? desc)
     {
+
         ISpecification<Product> productsWithBrandsAndTypes =
-            new ProductsWithBrandsAndTypesSpecification();
+            new ProductsWithBrandsAndTypesSpecification(sort, desc);
 
         IReadOnlyList<Product> products =
             await _productRepo.ListWithSpecAsync(productsWithBrandsAndTypes);

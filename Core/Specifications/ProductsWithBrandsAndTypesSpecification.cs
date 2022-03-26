@@ -7,17 +7,32 @@ public class ProductsWithBrandsAndTypesSpecification : BaseSpecification<Product
 {
     public ProductsWithBrandsAndTypesSpecification(int id) : base(p => p.Id == id)
     {
-        AddIncludes();
+        AddProductIncludes();
     }
 
-    public ProductsWithBrandsAndTypesSpecification()
+    public ProductsWithBrandsAndTypesSpecification(string? sortBy = "", bool? isDesc = false)
     {
-        AddIncludes();
+        AddProductIncludes();
+        AddProductOrderBy(sortBy ?? string.Empty);
+        IsDescendingOrder = isDesc ?? false;
     }
 
-    private void AddIncludes()
+    private void AddProductOrderBy(string sortBy)
     {
-        Includes.Add(p => p.ProductBrand);
-        Includes.Add(p => p.ProductType);
+        Expression<Func<Product, object>> orderByExpression =
+            sortBy.ToLower() switch
+            {
+                "name" => product => product.Name,
+                "price" => product => product.Price,
+                _ => product => product.Name
+            };
+
+        AddOrderBy(orderByExpression);
+    }
+
+    private void AddProductIncludes()
+    {
+        AddInclude(p => p.ProductBrand);
+        AddInclude(p => p.ProductType);
     }
 }

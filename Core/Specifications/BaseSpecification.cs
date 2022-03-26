@@ -3,12 +3,14 @@ using Core.Entities;
 
 namespace Core.Specifications;
 
-public class BaseSpecification<T> : ISpecification<T>
+public abstract class BaseSpecification<T> : ISpecification<T>
 {
     public Expression<Func<T, bool>>? Criteria { get; }
     public List<Expression<Func<T, object>>> Includes { get; } = new();
-    
-    public BaseSpecification(Expression<Func<T, bool>>? criteria = null)
+    public Expression<Func<T, object>>? OrderBy { get; private set; }
+    public bool IsDescendingOrder { get; protected init; }
+
+    protected BaseSpecification(Expression<Func<T, bool>>? criteria = null)
     {
         Criteria = criteria;
     }
@@ -16,5 +18,10 @@ public class BaseSpecification<T> : ISpecification<T>
     protected void AddInclude(Expression<Func<T, object>> includeExpression)
     {
         Includes.Add(includeExpression);
+    }
+
+    protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
+    {
+        OrderBy = orderByExpression;
     }
 }
