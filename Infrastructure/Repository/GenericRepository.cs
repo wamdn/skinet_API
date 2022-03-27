@@ -35,6 +35,11 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return await ApplySpecification(spec).ToListAsync();
     }
 
+    public async Task<int> CountAsync(ISpecification<TEntity> spec)
+    {
+        return await ApplySpecification(spec).CountAsync();
+    }
+
     private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
     {
         IQueryable<TEntity> query = _db.Set<TEntity>().AsQueryable();

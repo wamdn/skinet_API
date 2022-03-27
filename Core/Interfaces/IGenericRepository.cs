@@ -8,4 +8,5 @@ public interface IGenericRepository<TEntity>
     Task<IReadOnlyList<TEntity>> ListAllAsync();
     Task<TEntity?> GetOneWithSpecAsync(ISpecification<TEntity> spec);
     Task<IReadOnlyList<TEntity>> ListWithSpecAsync(ISpecification<TEntity> spec);
+    Task<int> CountAsync(ISpecification<TEntity> spec);
 }

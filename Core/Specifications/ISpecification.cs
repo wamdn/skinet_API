@@ -9,4 +9,6 @@ public interface ISpecification<T>
     List<Expression<Func<T, object>>> Includes { get; }
     Expression<Func<T, object>>? OrderBy { get; }
     bool IsDescendingOrder { get; }
+    int PageSize { get; }
+    int PageIndex { get; }
 }

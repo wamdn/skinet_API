@@ -29,8 +29,9 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
+
+app.UseCors("developmentPolicy");
 
 app.UseAuthorization();
 

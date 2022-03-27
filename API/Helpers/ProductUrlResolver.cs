@@ -13,7 +13,8 @@ public class ProductUrlResolver : IValueResolver<Product, ProductDTO, string>
         _config = config;
     }
 
-    public string Resolve(Product source, ProductDTO destination, string destMember, ResolutionContext context)
+    public string Resolve(
+        Product source, ProductDTO destination, string destMember, ResolutionContext context)
     {
         if (string.IsNullOrWhiteSpace(source.PictureUrl)) 
             return string.Empty;

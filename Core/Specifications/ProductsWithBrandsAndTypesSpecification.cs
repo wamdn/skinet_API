@@ -10,11 +10,24 @@ public class ProductsWithBrandsAndTypesSpecification : BaseSpecification<Product
         AddProductIncludes();
     }
 
-    public ProductsWithBrandsAndTypesSpecification(string? sortBy = "", bool? isDesc = false)
+    public ProductsWithBrandsAndTypesSpecification(ProductSpecParams specParams)
     {
+        // join
         AddProductIncludes();
-        AddProductOrderBy(sortBy ?? string.Empty);
-        IsDescendingOrder = isDesc ?? false;
+
+        // sorting
+        AddProductOrderBy(specParams.Sort);
+        IsDescendingOrder = specParams.Desc;
+
+        // filter
+        AddCriteria(p =>
+            (p.Name.ToLower().Contains(specParams.Search)) &&
+            (specParams.BrandId == null || p.ProductBrandId == specParams.BrandId) &&
+            (specParams.TypeId == null || p.ProductTypeId == specParams.TypeId)
+        );
+
+        // pagination
+        AddPagination(specParams.PageSize, specParams.PageIndex);
     }
 
     private void AddProductOrderBy(string sortBy)

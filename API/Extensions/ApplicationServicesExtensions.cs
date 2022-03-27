@@ -30,6 +30,18 @@ public static class ApplicationServicesExtensions
         services.AddScoped<IProductRepository, ProductRepository>();
         // Add GenericRepository
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        
+        // Enable CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy(name: "developmentPolicy",
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+        });
 
         return services;
     }
